@@ -14,21 +14,21 @@ import (
 )
 
 // NewRouter -.
-func NewRouter(handler *gin.Engine, l logger.Interface, a auth.AuthInterface, p sync.Progress, shelf library.Shelf) {
+func NewRouter(handler *gin.Engine, urlPrefix string, l logger.Interface, a auth.AuthInterface, p sync.Progress, shelf library.Shelf) {
 	// Options
 	handler.Use(gin.Logger())
 	handler.Use(gin.Recovery())
 
 	// K8s probe
-	handler.GET("/healthcheck", func(c *gin.Context) { c.Status(http.StatusOK) })
+	handler.GET(urlPrefix+"/healthcheck", func(c *gin.Context) { c.Status(http.StatusOK) })
 
 	// Prometheus metrics
-	handler.GET("/metrics", gin.WrapH(promhttp.Handler()))
+	handler.GET(urlPrefix+"/metrics", gin.WrapH(promhttp.Handler()))
 
 	// Routers
-	newUserRoutes(handler.Group("/"), a, l)
+	newUserRoutes(handler.Group(urlPrefix+"/"), a, l)
 
-	syncRoutes := handler.Group("/syncs")
+	syncRoutes := handler.Group(urlPrefix + "/syncs")
 	syncRoutes.Use(authDeviceMiddleware(a, l))
 	newSyncRoutes(syncRoutes, p, l)
 }

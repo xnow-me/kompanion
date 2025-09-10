@@ -11,6 +11,7 @@ import (
 
 func NewRouter(
 	handler *gin.Engine,
+	urlPrefix string,
 	a auth.AuthInterface,
 	l logger.Interface,
 	rs stats.ReadingStats,
@@ -19,7 +20,7 @@ func NewRouter(
 	handler.Use(gin.Logger())
 	handler.Use(gin.Recovery())
 
-	h := handler.Group("/webdav")
+	h := handler.Group(urlPrefix + "/webdav")
 	h.Use(basicAuth(a))
 	h.Handle("PROPFIND", "/", func(c *gin.Context) {
 		// Static response for PROPFIND

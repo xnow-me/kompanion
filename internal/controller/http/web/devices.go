@@ -7,12 +7,15 @@ import (
 )
 
 type deviceRoutes struct {
-	auth auth.AuthInterface
-	l    logger.Interface
+	auth      auth.AuthInterface
+	urlPrefix string
+	l         logger.Interface
 }
 
-func newDeviceRoutes(handler *gin.RouterGroup, a auth.AuthInterface, l logger.Interface) {
-	r := &deviceRoutes{a, l}
+func newDeviceRoutes(handler *gin.RouterGroup, urlPrefix string, a auth.AuthInterface, l logger.Interface) {
+	r := &deviceRoutes{a, urlPrefix, l}
+
+	handler.Group(urlPrefix)
 
 	handler.GET("/", r.listDevices)
 	handler.POST("/add", r.addDeviceAction)
@@ -29,7 +32,8 @@ func (r *deviceRoutes) listDevices(c *gin.Context) {
 	}
 
 	c.HTML(200, "devices", passStandartContext(c, gin.H{
-		"devices": devices,
+		"urlPrefix": r.urlPrefix,
+		"devices":   devices,
 	}))
 }
 
@@ -52,7 +56,7 @@ func (r *deviceRoutes) addDeviceAction(c *gin.Context) {
 		return
 	}
 
-	c.Redirect(302, "/devices")
+	c.Redirect(302, r.urlPrefix+"/devices")
 }
 
 func (r *deviceRoutes) deactivateDeviceAction(c *gin.Context) {
@@ -65,5 +69,5 @@ func (r *deviceRoutes) deactivateDeviceAction(c *gin.Context) {
 		return
 	}
 
-	c.Redirect(302, "/devices")
+	c.Redirect(302, r.urlPrefix+"/devices")
 }

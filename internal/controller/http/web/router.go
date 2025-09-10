@@ -24,6 +24,7 @@ import (
 
 func NewRouter(
 	handler *gin.Engine,
+	urlPrefix string,
 	l logger.Interface,
 	a auth.AuthInterface,
 	p sync.Progress,
@@ -42,7 +43,7 @@ func NewRouter(
 	if err != nil {
 		l.Error("Failed to get static files: %v", err)
 	}
-	handler.StaticFS("/static", http.FS(staticFs))
+	handler.StaticFS(urlPrefix+"/static", http.FS(staticFs))
 
 	config := goview.DefaultConfig
 	config.Root = "web/templates"
@@ -73,28 +74,28 @@ func NewRouter(
 	handler.HTMLRender = gv
 
 	// Home
-	handler.GET("/", func(c *gin.Context) {
-		c.Redirect(302, "/books")
+	handler.GET(urlPrefix+"/", func(c *gin.Context) {
+		c.Redirect(302, urlPrefix+"/books")
 	})
 
 	// Login
-	authGroup := handler.Group("/auth")
-	newAuthRoutes(authGroup, a, l)
+	authGroup := handler.Group(urlPrefix + "/auth")
+	newAuthRoutes(authGroup, urlPrefix, a, l)
 
 	// Product pages
-	bookGroup := handler.Group("/books")
-	bookGroup.Use(authMiddleware(a))
-	newBooksRoutes(bookGroup, shelf, stats, p, l)
+	bookGroup := handler.Group(urlPrefix + "/books")
+	bookGroup.Use(authMiddleware(a, urlPrefix))
+	newBooksRoutes(bookGroup, urlPrefix, shelf, stats, p, l)
 
 	// Stats pages
-	statsGroup := handler.Group("/stats")
-	statsGroup.Use(authMiddleware(a))
-	newStatsRoutes(statsGroup, stats, l)
+	statsGroup := handler.Group(urlPrefix + "/stats")
+	statsGroup.Use(authMiddleware(a, urlPrefix))
+	newStatsRoutes(statsGroup, urlPrefix, stats, l)
 
 	// Device management
-	deviceGroup := handler.Group("/devices")
-	deviceGroup.Use(authMiddleware(a))
-	newDeviceRoutes(deviceGroup, a, l)
+	deviceGroup := handler.Group(urlPrefix + "/devices")
+	deviceGroup.Use(authMiddleware(a, urlPrefix))
+	newDeviceRoutes(deviceGroup, urlPrefix, a, l)
 }
 
 func passStandartContext(c *gin.Context, data gin.H) gin.H {
