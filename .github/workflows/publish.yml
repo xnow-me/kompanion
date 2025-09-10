@@ -43,5 +43,5 @@ jobs:
           KOMPANION_VERSION=${{ steps.get_tag.outputs.TAG }}
         push: true
         tags: |
-          vanadium23/kompanion:latest
-          vanadium23/kompanion:${{ steps.get_tag.outputs.TAG }}
+          xnowme/kompanion:latest
+          xnowme/kompanion:${{ steps.get_tag.outputs.TAG }}
