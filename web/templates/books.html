@@ -4,7 +4,7 @@
 <div>
     <form method="post" action="{{.urlPrefix}}/books/upload" enctype="multipart/form-data" class="grid">
         <div>
-            <input type="file" name="book" accept=".epub,.pdf,.fb2">
+            <input type="file" name="book" accept=".epub,.pdf,.fb2" required>
         </div>
         <button style="flex-grow: 1;">Upload</button>
     </form>
