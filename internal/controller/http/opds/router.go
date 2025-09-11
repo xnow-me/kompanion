@@ -19,15 +19,14 @@ type OPDSRouter struct {
 }
 
 func NewRouter(
-	handler *gin.Engine,
-	urlPrefix string,
+	handler *gin.RouterGroup,
 	l logger.Interface,
 	a auth.AuthInterface,
 	p sync.Progress,
 	shelf library.Shelf) {
-	sh := &OPDSRouter{urlPrefix, shelf, l}
+	sh := &OPDSRouter{handler.BasePath(), shelf, l}
 
-	h := handler.Group(urlPrefix + "/opds")
+	h := handler.Group("/opds")
 	h.Use(basicAuth(a))
 	{
 		h.GET("/", sh.listShelves)

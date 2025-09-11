@@ -14,7 +14,6 @@ type authRoutes struct {
 
 func newAuthRoutes(handler *gin.RouterGroup, urlPrefix string, a auth.AuthInterface, l logger.Interface) {
 	r := &authRoutes{a, urlPrefix, l}
-	handler.Group(urlPrefix)
 
 	handler.GET("/login", r.loginForm)
 	handler.POST("/login", r.loginAction)

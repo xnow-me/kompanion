@@ -118,7 +118,6 @@ func generateDailyStatsChart(stats []stats.DailyStats) ([]byte, error) {
 }
 
 func newStatsRoutes(handler *gin.RouterGroup, urlPrefix string, stats stats.ReadingStats, l logger.Interface) {
-	handler.Group(urlPrefix)
 	handler.GET("/", func(c *gin.Context) {
 		// Get date range from query params, default to current month
 		now := time.Now()

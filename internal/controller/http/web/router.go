@@ -23,8 +23,8 @@ import (
 )
 
 func NewRouter(
-	handler *gin.Engine,
-	urlPrefix string,
+	handler *gin.RouterGroup,
+	router *gin.Engine,
 	l logger.Interface,
 	a auth.AuthInterface,
 	p sync.Progress,
@@ -38,12 +38,15 @@ func NewRouter(
 	handler.Use(func(c *gin.Context) {
 		c.Set("startTime", time.Now())
 	})
+
+	// hold origin prefix as urlPrefix
+	urlPrefix := handler.BasePath()
 	// static files
 	staticFs, err := fs.Sub(kompanion.WebAssets, "web/static")
 	if err != nil {
 		l.Error("Failed to get static files: %v", err)
 	}
-	handler.StaticFS(urlPrefix+"/static", http.FS(staticFs))
+	handler.StaticFS("/static", http.FS(staticFs))
 
 	config := goview.DefaultConfig
 	config.Root = "web/templates"
@@ -71,29 +74,29 @@ func NewRouter(
 	}
 	gv := ginview.New(config)
 	gv.SetFileHandler(embeddedFH)
-	handler.HTMLRender = gv
+	router.HTMLRender = gv
 
 	// Home
-	handler.GET(urlPrefix+"/", func(c *gin.Context) {
+	handler.GET("/", func(c *gin.Context) {
 		c.Redirect(302, urlPrefix+"/books")
 	})
 
 	// Login
-	authGroup := handler.Group(urlPrefix + "/auth")
+	authGroup := handler.Group("/auth")
 	newAuthRoutes(authGroup, urlPrefix, a, l)
 
 	// Product pages
-	bookGroup := handler.Group(urlPrefix + "/books")
+	bookGroup := handler.Group("/books")
 	bookGroup.Use(authMiddleware(a, urlPrefix))
 	newBooksRoutes(bookGroup, urlPrefix, shelf, stats, p, l)
 
 	// Stats pages
-	statsGroup := handler.Group(urlPrefix + "/stats")
+	statsGroup := handler.Group("/stats")
 	statsGroup.Use(authMiddleware(a, urlPrefix))
 	newStatsRoutes(statsGroup, urlPrefix, stats, l)
 
 	// Device management
-	deviceGroup := handler.Group(urlPrefix + "/devices")
+	deviceGroup := handler.Group("/devices")
 	deviceGroup.Use(authMiddleware(a, urlPrefix))
 	newDeviceRoutes(deviceGroup, urlPrefix, a, l)
 }

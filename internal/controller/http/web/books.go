@@ -23,7 +23,6 @@ type booksRoutes struct {
 
 func newBooksRoutes(handler *gin.RouterGroup, urlPrefix string, shelf library.Shelf, stats stats.ReadingStats, progress syncpkg.Progress, l logger.Interface) {
 	r := &booksRoutes{urlPrefix: urlPrefix, shelf: shelf, stats: stats, progress: progress, logger: l}
-	handler.Group(urlPrefix)
 
 	handler.GET("/", r.listBooks)
 	handler.POST("/upload", r.uploadBook)
