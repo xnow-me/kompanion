@@ -40,7 +40,7 @@ func NewRouter(
 	})
 
 	// hold origin prefix as urlPrefix
-	urlPrefix := handler.BasePath()
+	urlPrefix := strings.TrimSuffix(handler.BasePath(), "/")
 	// static files
 	staticFs, err := fs.Sub(kompanion.WebAssets, "web/static")
 	if err != nil {

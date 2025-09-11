@@ -3,6 +3,7 @@ package opds
 import (
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -24,7 +25,8 @@ func NewRouter(
 	a auth.AuthInterface,
 	p sync.Progress,
 	shelf library.Shelf) {
-	sh := &OPDSRouter{handler.BasePath(), shelf, l}
+	urlPrefix := strings.TrimSuffix(handler.BasePath(), "/")
+	sh := &OPDSRouter{urlPrefix, shelf, l}
 
 	h := handler.Group("/opds")
 	h.Use(basicAuth(a))
